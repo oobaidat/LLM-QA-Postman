@@ -1,0 +1,1032 @@
+{
+	"info": {
+		"_postman_id": "a711a064-3188-4126-af27-d1a46bb86665",
+		"name": "LLM Automated QA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50377666",
+		"_collection_link": "https://obaidat001-152848.postman.co/workspace/Osama-Obaidat's-Workspace~1dc8591a-5b7a-42b3-8510-b1f94dd0e58b/collection/50377666-a711a064-3188-4126-af27-d1a46bb86665?action=share&source=collection_link&creator=50377666"
+	},
+	"item": [
+		{
+			"name": "Test 1 - Paris",
+			"item": [
+				{
+					"name": "Get Answer 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// sanity tests\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response Content-Type is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Candidates array, content object, parts array, and role field structure are valid\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData.candidates).to.be.an('array');\r",
+									"    \r",
+									"    responseData.candidates.forEach(function(candidate) {\r",
+									"        pm.expect(candidate.content).to.be.an('object');\r",
+									"        \r",
+									"        candidate.content.parts.forEach(function(part) {\r",
+									"            pm.expect(part).to.be.an('object');\r",
+									"        });\r",
+									"        \r",
+									"        pm.expect(candidate.content.role).to.be.a('string');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"let answerText = \"\";\r",
+									"let jsonData;\r",
+									"\r",
+									"// try to parse LLM answer from expected format (fall back to response.text() if not found)\r",
+									"try {\r",
+									"    jsonData = pm.response.json();\r",
+									"    answerText = jsonData.candidates[0].content.parts[0].text.trim();\r",
+									"} catch (e) {\r",
+									"    jsonData = null;\r",
+									"    answerTextText = pm.response.text().trim();\r",
+									"    console.log(\"Test 1 LLM output:\", answerText);\r",
+									"}\r",
+									"\r",
+									"pm.test(\"LLM returned a non-empty answer for test 1\", function () {\r",
+									"    pm.expect(answerText, \"LLM output was empty\").to.be.a(\"string\").and.not.empty;\r",
+									"});\r",
+									"\r",
+									"// store answer into collectionVariables (or empty string if invalid)\r",
+									"pm.collectionVariables.set(\"answer1\", answerText || \"\");\r",
+									"\r",
+									"// console output relevant information\r",
+									"console.log(\"Test 1 LLM model:\", pm.environment.get(\"geminiModel\"));\r",
+									"console.log(\"Test 1 prompt:\", pm.collectionVariables.get(\"prompt1\"));\r",
+									"console.log(\"Test 1 answer:\", answerText);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const prompt = pm.collectionVariables.get(\"prompt1\");\r",
+									"const temperature = pm.collectionVariables.get(\"temperature\");\r",
+									"\r",
+									"const payload = {\r",
+									"    contents: [\r",
+									"        {\r",
+									"            parts: [\r",
+									"                {\r",
+									"                    text: prompt\r",
+									"                }\r",
+									"            ]\r",
+									"        }\r",
+									"    ],\r",
+									"    generation_config: {\r",
+									"        temperature: temperature\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.request.body.update(JSON.stringify(payload));\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "// generated from the pre-request script",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{geminiUrl}}/{{geminiModel}}:generateContent",
+							"host": [
+								"{{geminiUrl}}"
+							],
+							"path": [
+								"{{geminiModel}}:generateContent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Evaluate Answer 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response Content-Type is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Candidates array, content object, parts array, and role field structure are valid\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData.candidates).to.be.an('array');\r",
+									"    \r",
+									"    responseData.candidates.forEach(function(candidate) {\r",
+									"        pm.expect(candidate.content).to.be.an('object');\r",
+									"        \r",
+									"        candidate.content.parts.forEach(function(part) {\r",
+									"            pm.expect(part).to.be.an('object');\r",
+									"        });\r",
+									"        \r",
+									"        pm.expect(candidate.content.role).to.be.a('string');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"let evalText = \"\";\r",
+									"let jsonData;\r",
+									"\r",
+									"try {\r",
+									"    jsonData = pm.response.json();\r",
+									"    evalText = jsonData.candidates[0].content.parts[0].text.trim();\r",
+									"} catch (e) {\r",
+									"    jsonData = null;\r",
+									"    evalText = pm.response.text().trim();\r",
+									"    console.log(\"Test 1 evaluator LLM output:\", evalText);\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Evaluator LLM returned a non-empty evaluation for test 1\", function () {\r",
+									"    pm.expect(evalText, \"Evaluator LLM output was empty\").to.be.a(\"string\").and.not.empty;\r",
+									"});\r",
+									"\r",
+									"let evalJson;\r",
+									"try {\r",
+									"    evalJson = JSON.parse(evalText);\r",
+									"} catch (e) {\r",
+									"    // if model added extra text, attempt to extract JSON via regex as a fallback\r",
+									"    const match = evalText.match(/\\{[\\s\\S]*\\}/); // (find the first {})\r",
+									"    if (match) {\r",
+									"        evalJson = JSON.parse(match[0]);\r",
+									"    } else {\r",
+									"        evalJson = null;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"console.log(\"Test 1 evaluator LLM model:\", pm.environment.get(\"geminiModel\"));\r",
+									"console.log(\"Test 1 evaluator prompt:\", pm.collectionVariables.get(\"evaluation1\"));\r",
+									"\r",
+									"// run QA tests\r",
+									"if (!evalJson) {\r",
+									"    pm.test(\"Evaluator LLM returned valid JSON for test 1\", function () {\r",
+									"        pm.expect.fail(\"Could not parse evaluator JSON: \" + evalText);\r",
+									"    });\r",
+									"} else {\r",
+									"    pm.test(\"Test 1 evaluator JSON has verdict\", function () {\r",
+									"        pm.expect(evalJson).to.have.property(\"verdict\");\r",
+									"        pm.expect([\"PASS\", \"FAIL\"]).to.include(evalJson.verdict);\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Test 1 evaluator determined LLM answer is correct\", function () {\r",
+									"        pm.expect(evalJson.verdict, evalJson.reason).to.equal(\"PASS\");\r",
+									"    });\r",
+									"\r",
+									"    pm.collectionVariables.set(\"verdict1\", evalJson.verdict || \"\");\r",
+									"    pm.collectionVariables.set(\"reason1\", evalJson.reason || \"\");\r",
+									"\r",
+									"    console.log(\"Test 1 verdict:\", evalJson.verdict);\r",
+									"    console.log(\"Test 1 reason:\", evalJson.reason);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const role = pm.collectionVariables.get(\"evalRole\");\r",
+									"const prompt = pm.collectionVariables.get(\"prompt1\");\r",
+									"const answer = pm.collectionVariables.get(\"answer1\");\r",
+									"const evaluation = pm.collectionVariables.get(\"evaluation1\");\r",
+									"const output = pm.collectionVariables.get(\"evalOutput\");\r",
+									"const temperature = pm.collectionVariables.get(\"temperature\");\r",
+									"\r",
+									"const evalPrompt =\r",
+									"    `${role}\\n\\n` +\r",
+									"    `Given:\\n` +\r",
+									"    `LLM prompt:\\n${prompt}\\n` +\r",
+									"    `LLM answer:\\n${answer}\\n` +\r",
+									"    `Evaluation criteria:\\n${evaluation}\\n\\n` +\r",
+									"    `Return ONLY a JSON object in the following format (no extra text):\\n${output}`;\r",
+									"\r",
+									"const payload = {\r",
+									"    contents: [\r",
+									"        {\r",
+									"            parts: [\r",
+									"                {\r",
+									"                    text: evalPrompt\r",
+									"                }\r",
+									"            ]\r",
+									"        }\r",
+									"    ],\r",
+									"    generation_config: {\r",
+									"        temperature: temperature\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.request.body.update(JSON.stringify(payload));\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"contents\": [\r\n        {\r\n            \"parts\": [\r\n                {\r\n                    \"text\": \"{{evalRole}}\\n\\nGiven:\\nLLM prompt:\\n\\\"{{prompt1}}\\\"\\n\\nLLM Answer:\\n\\\"{{answer1}}\\\"\\n\\nEvaluation criteria:\\n\\\"{{evaluation1}}\\\"\\n\\n{{evalOutput}}\\n\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"generation_config\": {\r\n        \"temperature\": {{temperature}}\r\n    }\r\n}\r\n\r\n// generated from the pre-request script",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{geminiUrl}}/{{geminiModel}}:generateContent",
+							"host": [
+								"{{geminiUrl}}"
+							],
+							"path": [
+								"{{geminiModel}}:generateContent"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Test 2 - Cat",
+			"item": [
+				{
+					"name": "Get Answer 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response Content-Type is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Candidates array, content object, parts array, and role field structure are valid\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData.candidates).to.be.an('array');\r",
+									"    \r",
+									"    responseData.candidates.forEach(function(candidate) {\r",
+									"        pm.expect(candidate.content).to.be.an('object');\r",
+									"        \r",
+									"        candidate.content.parts.forEach(function(part) {\r",
+									"            pm.expect(part).to.be.an('object');\r",
+									"        });\r",
+									"        \r",
+									"        pm.expect(candidate.content.role).to.be.a('string');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"let answerText = \"\";\r",
+									"let jsonData;\r",
+									"\r",
+									"try {\r",
+									"    jsonData = pm.response.json();\r",
+									"    answerText = jsonData.candidates[0].content.parts[0].text.trim();\r",
+									"} catch (e) {\r",
+									"    jsonData = null;\r",
+									"    answerTextText = pm.response.text().trim();\r",
+									"    console.log(\"Test 2 LLM output:\", answerText);\r",
+									"}\r",
+									"\r",
+									"pm.test(\"LLM returned a non-empty answer for test 2\", function () {\r",
+									"    pm.expect(answerText, \"LLM output was empty\").to.be.a(\"string\").and.not.empty;\r",
+									"});\r",
+									"\r",
+									"pm.collectionVariables.set(\"answer2\", answerText || \"\");\r",
+									"\r",
+									"console.log(\"Test 2 LLM model:\", pm.environment.get(\"geminiModel\"));\r",
+									"console.log(\"Test 2 prompt:\", pm.collectionVariables.get(\"prompt2\"));\r",
+									"console.log(\"Test 2 answer:\", answerText);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const prompt = pm.collectionVariables.get(\"prompt2\");\r",
+									"const temperature = pm.collectionVariables.get(\"temperature\");\r",
+									"\r",
+									"const payload = {\r",
+									"    contents: [\r",
+									"        {\r",
+									"            parts: [\r",
+									"                {\r",
+									"                    text: prompt\r",
+									"                }\r",
+									"            ]\r",
+									"        }\r",
+									"    ],\r",
+									"    generation_config: {\r",
+									"        temperature: temperature\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.request.body.update(JSON.stringify(payload));\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "// generated from the pre-request script",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{geminiUrl}}/{{geminiModel}}:generateContent",
+							"host": [
+								"{{geminiUrl}}"
+							],
+							"path": [
+								"{{geminiModel}}:generateContent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Evaluate Answer 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response Content-Type is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Candidates array, content object, parts array, and role field structure are valid\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData.candidates).to.be.an('array');\r",
+									"    \r",
+									"    responseData.candidates.forEach(function(candidate) {\r",
+									"        pm.expect(candidate.content).to.be.an('object');\r",
+									"        \r",
+									"        candidate.content.parts.forEach(function(part) {\r",
+									"            pm.expect(part).to.be.an('object');\r",
+									"        });\r",
+									"        \r",
+									"        pm.expect(candidate.content.role).to.be.a('string');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"let evalText = \"\";\r",
+									"let jsonData;\r",
+									"\r",
+									"try {\r",
+									"    jsonData = pm.response.json();\r",
+									"    evalText = jsonData.candidates[0].content.parts[0].text.trim();\r",
+									"} catch (e) {\r",
+									"    jsonData = null;\r",
+									"    evalText = pm.response.text().trim();\r",
+									"    console.log(\"Test 2 evaluator LLM output:\", evalText);\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Evaluator LLM returned a non-empty evaluation for test 2\", function () {\r",
+									"    pm.expect(evalText, \"Evaluator LLM output was empty\").to.be.a(\"string\").and.not.empty;\r",
+									"});\r",
+									"\r",
+									"let evalJson;\r",
+									"try {\r",
+									"    evalJson = JSON.parse(evalText);\r",
+									"} catch (e) {\r",
+									"    const match = evalText.match(/\\{[\\s\\S]*\\}/);\r",
+									"    if (match) {\r",
+									"        evalJson = JSON.parse(match[0]);\r",
+									"    } else {\r",
+									"        evalJson = null;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"console.log(\"Test 2 evaluator LLM model:\", pm.environment.get(\"geminiModel\"));\r",
+									"console.log(\"Test 2 evaluator prompt:\", pm.collectionVariables.get(\"evaluation2\"));\r",
+									"\r",
+									"if (!evalJson) {\r",
+									"    pm.test(\"Evaluator LLM returned valid JSON for test 2\", function () {\r",
+									"        pm.expect.fail(\"Could not parse evaluator JSON: \" + evalText);\r",
+									"    });\r",
+									"} else {\r",
+									"    pm.test(\"Test 2 evaluator JSON has verdict\", function () {\r",
+									"        pm.expect(evalJson).to.have.property(\"verdict\");\r",
+									"        pm.expect([\"PASS\", \"FAIL\"]).to.include(evalJson.verdict);\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Test 2 evaluator determined LLM answer is correct\", function () {\r",
+									"        pm.expect(evalJson.verdict, evalJson.reason).to.equal(\"PASS\");\r",
+									"    });\r",
+									"\r",
+									"    pm.collectionVariables.set(\"verdict2\", evalJson.verdict || \"\");\r",
+									"    pm.collectionVariables.set(\"reason2\", evalJson.reason || \"\");\r",
+									"\r",
+									"    console.log(\"Test 2 verdict:\", evalJson.verdict);\r",
+									"    console.log(\"Test 2 reason:\", evalJson.reason);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const role = pm.collectionVariables.get(\"evalRole\");\r",
+									"const prompt = pm.collectionVariables.get(\"prompt2\");\r",
+									"const answer = pm.collectionVariables.get(\"answer2\");\r",
+									"const evaluation = pm.collectionVariables.get(\"evaluation2\");\r",
+									"const output = pm.collectionVariables.get(\"evalOutput\");\r",
+									"const temperature = pm.collectionVariables.get(\"temperature\");\r",
+									"\r",
+									"const evalPrompt =\r",
+									"    `${role}\\n\\n` +\r",
+									"    `Given:\\n` +\r",
+									"    `LLM prompt:\\n${prompt}\\n` +\r",
+									"    `LLM answer:\\n${answer}\\n` +\r",
+									"    `Evaluation criteria:\\n${evaluation}\\n\\n` +\r",
+									"    `Return ONLY a JSON object in the following format (no extra text):\\n${output}`;\r",
+									"\r",
+									"const payload = {\r",
+									"    contents: [\r",
+									"        {\r",
+									"            parts: [\r",
+									"                {\r",
+									"                    text: evalPrompt\r",
+									"                }\r",
+									"            ]\r",
+									"        }\r",
+									"    ],\r",
+									"    generation_config: {\r",
+									"        temperature: temperature\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.request.body.update(JSON.stringify(payload));\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "// generated from the pre-request script",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{geminiUrl}}/{{geminiModel}}:generateContent",
+							"host": [
+								"{{geminiUrl}}"
+							],
+							"path": [
+								"{{geminiModel}}:generateContent"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Test 3 - Shopify",
+			"item": [
+				{
+					"name": "Get Answer 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response Content-Type is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Candidates array, content object, parts array, and role field structure are valid\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData.candidates).to.be.an('array');\r",
+									"    \r",
+									"    responseData.candidates.forEach(function(candidate) {\r",
+									"        pm.expect(candidate.content).to.be.an('object');\r",
+									"        \r",
+									"        candidate.content.parts.forEach(function(part) {\r",
+									"            pm.expect(part).to.be.an('object');\r",
+									"        });\r",
+									"        \r",
+									"        pm.expect(candidate.content.role).to.be.a('string');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"let answerText = \"\";\r",
+									"let jsonData;\r",
+									"\r",
+									"try {\r",
+									"    jsonData = pm.response.json();\r",
+									"    answerText = jsonData.candidates[0].content.parts[0].text.trim();\r",
+									"} catch (e) {\r",
+									"    jsonData = null;\r",
+									"    answerTextText = pm.response.text().trim();\r",
+									"    console.log(\"Test 3 LLM output:\", answerText);\r",
+									"}\r",
+									"\r",
+									"pm.test(\"LLM returned a non-empty answer for test 3\", function () {\r",
+									"    pm.expect(answerText, \"LLM output was empty\").to.be.a(\"string\").and.not.empty;\r",
+									"});\r",
+									"\r",
+									"pm.collectionVariables.set(\"answer3\", answerText || \"\");\r",
+									"\r",
+									"console.log(\"Test 3 LLM model:\", pm.environment.get(\"geminiModel\"));\r",
+									"console.log(\"Test 3 prompt:\", pm.collectionVariables.get(\"prompt3\"));\r",
+									"console.log(\"Test 3 answer:\", answerText);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const prompt = pm.collectionVariables.get(\"prompt3\");\r",
+									"const temperature = pm.collectionVariables.get(\"temperature\");\r",
+									"\r",
+									"const payload = {\r",
+									"    contents: [\r",
+									"        {\r",
+									"            parts: [\r",
+									"                {\r",
+									"                    text: prompt\r",
+									"                }\r",
+									"            ]\r",
+									"        }\r",
+									"    ],\r",
+									"    generation_config: {\r",
+									"        temperature: temperature\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.request.body.update(JSON.stringify(payload));\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "// generated from the pre-request script",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{geminiUrl}}/{{geminiModel}}:generateContent",
+							"host": [
+								"{{geminiUrl}}"
+							],
+							"path": [
+								"{{geminiModel}}:generateContent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Evaluate Answer 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response Content-Type is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Candidates array, content object, parts array, and role field structure are valid\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData.candidates).to.be.an('array');\r",
+									"    \r",
+									"    responseData.candidates.forEach(function(candidate) {\r",
+									"        pm.expect(candidate.content).to.be.an('object');\r",
+									"        \r",
+									"        candidate.content.parts.forEach(function(part) {\r",
+									"            pm.expect(part).to.be.an('object');\r",
+									"        });\r",
+									"        \r",
+									"        pm.expect(candidate.content.role).to.be.a('string');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"let evalText = \"\";\r",
+									"let jsonData;\r",
+									"\r",
+									"try {\r",
+									"    jsonData = pm.response.json();\r",
+									"    evalText = jsonData.candidates[0].content.parts[0].text.trim();\r",
+									"} catch (e) {\r",
+									"    jsonData = null;\r",
+									"    evalText = pm.response.text().trim();\r",
+									"    console.log(\"Test 2 evaluator LLM output:\", evalText);\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Evaluator LLM returned a non-empty evaluation for test 3\", function () {\r",
+									"    pm.expect(evalText, \"Evaluator LLM output was empty\").to.be.a(\"string\").and.not.empty;\r",
+									"});\r",
+									"\r",
+									"let evalJson;\r",
+									"try {\r",
+									"    evalJson = JSON.parse(evalText);\r",
+									"} catch (e) {\r",
+									"    const match = evalText.match(/\\{[\\s\\S]*\\}/);\r",
+									"    if (match) {\r",
+									"        evalJson = JSON.parse(match[0]);\r",
+									"    } else {\r",
+									"        evalJson = null;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"console.log(\"Test 3 evaluator LLM model:\", pm.environment.get(\"geminiModel\"));\r",
+									"console.log(\"Test 3 evaluator prompt:\", pm.collectionVariables.get(\"evaluation3\"));\r",
+									"\r",
+									"if (!evalJson) {\r",
+									"    pm.test(\"Evaluator LLM returned valid JSON for test 3\", function () {\r",
+									"        pm.expect.fail(\"Could not parse evaluator JSON: \" + evalText);\r",
+									"    });\r",
+									"} else {\r",
+									"    pm.test(\"Test 3 evaluator JSON has verdict\", function () {\r",
+									"        pm.expect(evalJson).to.have.property(\"verdict\");\r",
+									"        pm.expect([\"PASS\", \"FAIL\"]).to.include(evalJson.verdict);\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Test 3 evaluator determined LLM answer is correct\", function () {\r",
+									"        pm.expect(evalJson.verdict, evalJson.reason).to.equal(\"PASS\");\r",
+									"    });\r",
+									"\r",
+									"    pm.collectionVariables.set(\"verdict3\", evalJson.verdict || \"\");\r",
+									"    pm.collectionVariables.set(\"reason3\", evalJson.reason || \"\");\r",
+									"\r",
+									"    console.log(\"Test 3 verdict:\", evalJson.verdict);\r",
+									"    console.log(\"Test 3 reason:\", evalJson.reason);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const role = pm.collectionVariables.get(\"evalRole\");\r",
+									"const prompt = pm.collectionVariables.get(\"prompt3\");\r",
+									"const answer = pm.collectionVariables.get(\"answer3\");\r",
+									"const evaluation = pm.collectionVariables.get(\"evaluation3\");\r",
+									"const output = pm.collectionVariables.get(\"evalOutput\");\r",
+									"const temperature = pm.collectionVariables.get(\"temperature\");\r",
+									"\r",
+									"const evalPrompt =\r",
+									"    `${role}\\n\\n` +\r",
+									"    `Given:\\n` +\r",
+									"    `LLM prompt:\\n${prompt}\\n` +\r",
+									"    `LLM answer:\\n${answer}\\n` +\r",
+									"    `Evaluation criteria:\\n${evaluation}\\n\\n` +\r",
+									"    `Return ONLY a JSON object in the following format (no extra text):\\n${output}`;\r",
+									"\r",
+									"const payload = {\r",
+									"    contents: [\r",
+									"        {\r",
+									"            parts: [\r",
+									"                {\r",
+									"                    text: evalPrompt\r",
+									"                }\r",
+									"            ]\r",
+									"        }\r",
+									"    ],\r",
+									"    generation_config: {\r",
+									"        temperature: temperature\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.request.body.update(JSON.stringify(payload));\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "// generated from the pre-request script",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{geminiUrl}}/{{geminiModel}}:generateContent",
+							"host": [
+								"{{geminiUrl}}"
+							],
+							"path": [
+								"{{geminiModel}}:generateContent"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Export Results",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let v1 = pm.collectionVariables.get(\"answer1\");\r",
+							"let v2 = pm.collectionVariables.get(\"verdict1\");\r",
+							"let v3 = pm.collectionVariables.get(\"reason1\");\r",
+							"\r",
+							"let v4 = pm.collectionVariables.get(\"answer2\");\r",
+							"let v5 = pm.collectionVariables.get(\"verdict2\");\r",
+							"let v6 = pm.collectionVariables.get(\"reason2\");\r",
+							"\r",
+							"let v7 = pm.collectionVariables.get(\"answer3\");\r",
+							"let v8 = pm.collectionVariables.get(\"verdict3\");\r",
+							"let v9 = pm.collectionVariables.get(\"reason3\");\r",
+							"\r",
+							"pm.test(\"All generated variables are defined before export\", function () {\r",
+							"    pm.expect(v1, \"answer1 is not set\").to.be.ok;\r",
+							"    pm.expect(v2, \"verdict1 is not set\").to.be.ok;\r",
+							"    pm.expect(v3, \"reason1 is not set\").to.be.ok;\r",
+							"\r",
+							"    pm.expect(v4, \"answer2 is not set\").to.be.ok;\r",
+							"    pm.expect(v5, \"verdict2 is not set\").to.be.ok;\r",
+							"    pm.expect(v6, \"reason2 is not set\").to.be.ok;\r",
+							"\r",
+							"    pm.expect(v7, \"answer3 is not set\").to.be.ok;\r",
+							"    pm.expect(v8, \"verdict3 is not set\").to.be.ok;\r",
+							"    pm.expect(v9, \"reason3 is not set\").to.be.ok;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"model\": \"{{geminiModel}}\",\r\n    \"evalModel\": \"{{geminiModel}}\",\r\n    \"tests\": [\r\n        {\r\n            \"name\": \"Test 1 - Paris\",\r\n            \"prompt\": \"{{prompt1}}\",\r\n            \"answer\": \"{{answer1}}\",\r\n            \"verdict\": \"{{verdict1}}\",\r\n            \"reason\": \"{{reason1}}\"\r\n        },\r\n        {\r\n            \"name\": \"Test 2 - Cat\",\r\n            \"prompt\": \"{{prompt2}}\",\r\n            \"answer\": \"{{answer2}}\",\r\n            \"verdict\": \"{{verdict2}}\",\r\n            \"reason\": \"{{reason2}}\"\r\n        },\r\n        {\r\n            \"name\": \"Test 3 - Shopify\",\r\n            \"prompt\": \"{{prompt3}}\",\r\n            \"answer\": \"{{answer3}}\",\r\n            \"verdict\": \"{{verdict3}}\",\r\n            \"reason\": \"{{reason3}}\"\r\n        }\r\n    ],\r\n    \"runTimestamp\": \"{{$timestamp}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{webhookUrl}}",
+					"host": [
+						"{{webhookUrl}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{geminiApiKey}}",
+				"type": "string"
+			},
+			{
+				"key": "in",
+				"value": "query",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "key",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "geminiUrl",
+			"value": "https://generativelanguage.googleapis.com/v1beta/models"
+		},
+		{
+			"key": "geminiModel",
+			"value": "gemini-2.0-flash"
+		},
+		{
+			"key": "prompt1",
+			"value": "Which city is the capital of the country where the Eiffel Tower is located?"
+		},
+		{
+			"key": "evaluation1",
+			"value": "The answer must clearly identify Paris as the capital city of France."
+		},
+		{
+			"key": "prompt2",
+			"value": "Tell me a story of an animal that has ears in shape of a triangle and does meow."
+		},
+		{
+			"key": "evaluation2",
+			"value": "The story must clearly refer to a cat as the animal."
+		},
+		{
+			"key": "prompt3",
+			"value": "How would you explain what Shopify does and the core problem it solves for businesses?"
+		},
+		{
+			"key": "evaluation3",
+			"value": "The answer must clearly identify shopify as a platform that allows businesses to set up and run an online store with little to no technical expertise."
+		},
+		{
+			"key": "evalRole",
+			"value": "You are a large language model prompt answer quality assurance evaluator."
+		},
+		{
+			"key": "evalOutput",
+			"value": "{\\n  \\\"verdict\\\": \\\"PASS\\\" or \\\"FAIL\\\",\\n  \\\"reason\\\": \\\"short explanation of why\\\"\\n}"
+		},
+		{
+			"key": "temperature",
+			"value": "0",
+			"description": "temperature set as 0 to maximize deterministic output"
+		},
+		{
+			"key": "answer1",
+			"value": ""
+		},
+		{
+			"key": "verdict1",
+			"value": ""
+		},
+		{
+			"key": "reason1",
+			"value": ""
+		},
+		{
+			"key": "answer2",
+			"value": ""
+		},
+		{
+			"key": "verdict2",
+			"value": ""
+		},
+		{
+			"key": "reason2",
+			"value": ""
+		},
+		{
+			"key": "answer3",
+			"value": ""
+		},
+		{
+			"key": "verdict3",
+			"value": ""
+		},
+		{
+			"key": "reason3",
+			"value": ""
+		}
+	]
+}
